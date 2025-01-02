@@ -21,7 +21,7 @@ ${fastp} -A -G -Q -L -i ${base2}_1.fastq  -I ${base2}_2.fastq  -o ${base2}_R1.fa
 
 # Remove bacteria
 bowtie2 -x /hl/weiguanyue/databases/pig_MAG/pig_bacteria  -p 5  -1 ${fqs1} -2 ${fqs2} |samtools view  -bS -o ${base2}.bam
-#exect pairs nomapping 
+# exect pairs nomapping 
 samtools view   -bf 12 -F 256 ${base2}.bam >${base2}_nobac.bam
 samtools sort -n ${base2}_nobac.bam -o ${base2}_nobacsort.bam
 samtools fastq ${base2}_nobacsort.bam -1 ${base2}_1.fastq.gz -2 ${base2}_2.fastq.gz
