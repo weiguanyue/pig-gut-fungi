@@ -10,6 +10,7 @@ bowtie2 -x sus_11.1 -p 5  -1 ${fqs1} -2 ${fqs2} | samtools view -@2 -bS -o ${bas
 samtools view -@3  -bf 12 -F 256 ${base2}.bam |samtools sort  -@3 -n  -o ${base2}_bothEndsUnmapped_sorted.bam
 wait
 ${bedtools} bamtofastq -i ${base2}_bothEndsUnmapped_sorted.bam -fq ${base2}_1.fastq -fq2 ${base2}_2.fastq
+
 #Generate Reports
 ${fastp} -A -G -Q -L -i ${base2}_1.fastq  -I ${base2}_2.fastq  -o ${base2}_R1.fastq.gz   -O ${base2}_R2.fastq.gz   -h ${base2}_final.html  -j ${base2}_final.json
 
