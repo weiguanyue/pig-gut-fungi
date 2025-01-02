@@ -15,20 +15,27 @@ ${fastp} -A -G -Q -L -i ${base2}_1.fastq  -I ${base2}_2.fastq  -o ${base2}_R1.fa
 
 
 samtools view -b -h -F 4 -F  256  ${data}/${base2}.bam >${base2}_mapped.bam
+
 #quilty MAPQ 30
 samtools view -q 30 ${base2}_mapped.bam >${base2}_30mapped.sam
 samtools view -bq 30 ${base2}_mapped.bam >${base2}_30mapped.bam
-python /hl/weiguanyue/1_data/01_markergene/01_genomes/00_mapped/coverage80filter.py -i  ${base2}_30mapped.sam -o ${base2}_list
+python coverage80filter.py -i  ${base2}_30mapped.sam -o ${base2}_list
+
 #exact coverage 80%
 samtools view  ${base2}_30mapped.bam |grep -f  ${base2}_list >${base2}_30mappedc80.sam
-samtools view -bt  /hl/weiguanyue/genome/fungi/2_dereplicated_fungi/00_redundancy/00/00_databases/index/3156_rename.fa.fai  ${base2}_30mappedc80.sam -o ${base2}_30mappedc80.bam
+samtools view -bt  3156_rename.fa.fai  ${base2}_30mappedc80.sam -o ${base2}_30mappedc80.bam
 samtools sort ${base2}_30mappedc80.bam -o  ${base2}_30mappedc80sort.bam
 samtools index ${base2}_30mappedc80sort.bam
+
 #exact genomes reads
 samtools idxstats  ${base2}_30mappedc80sort.bam >${base2}_idx.txt
+
 awk '$3 > 0'  ${base2}_idx.txt|awk '{print $1"_"$3}'|awk -F _ '{print$1"_"$2,$4}' >${base2}_hitall.txt
+
 #sum same reads
 awk '{a[$1]+=$2} END {for(i in a) print i" "a[i]b[i]}' ${base2}_hitall.txt >${base2}_hit.txt
+
 buglist.py -i  ${base2}_hit.txt -t final_taxonomy.txt  -o taxonomy.txt
+
 
 coverm genome --bam-files   ${base2}_30mappedc80sort.bam  -m rpkm -o ${base2}_rpkm.tsv --min-covered-fraction 0 --genome-fasta-files   *.fa   -t 2
